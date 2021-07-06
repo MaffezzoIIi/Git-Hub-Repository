@@ -46,7 +46,7 @@ export const Form = styled.form`
   }
 `;
 
-export const Repository = styled.div`
+export const Repositories = styled.div`
   margin-top: 40px;
 
   max-width: 700px;

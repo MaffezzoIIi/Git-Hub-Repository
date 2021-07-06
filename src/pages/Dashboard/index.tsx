@@ -1,80 +1,60 @@
 import React, { useState, FormEvent } from 'react';
 import api from '../../services/api';
 
-import { Title, Repository, Form } from './style';
+import { Title, Repositories, Form } from './style';
+
+interface Repository {
+  fullName: string;
+  description: string;
+  owner: {
+    login: string;
+    avatarUrl: string;
+  };
+}
 
 const Dashboard: React.FC = () => {
   const [newRepo, setNewRepo] = useState('');
 
-  async function handleAddRepository(event: FormEvent<HTMLFormElement>): Promise<void> {
+  const [repositories, setRepositories] = useState<Repository[]>([]);
+
+  async function handleAddRepository(
+    event: FormEvent<HTMLFormElement>,
+  ): Promise<void> {
     event.preventDefault();
 
-    const response = api.get(`repos/${newRepo}`);
+    const response = await api.get<Repository>(`repos/${newRepo}`);
+    const repository = response.data;
+
+    setRepositories([...repositories, repository]);
   }
 
   return (
     <>
       <Title>Explore repositórios no GitHub</Title>
 
-      <Form action="test">
-        <input type="text" placeholder="Digite o nome do repositório" />
+      <Form onSubmit={handleAddRepository}>
+        <input
+          value={newRepo}
+          onChange={e => setNewRepo(e.target.value)}
+          placeholder="Digite o nome do repositório"
+        />
         <button type="submit">Pesquisar</button>
       </Form>
 
-      <Repository>
-        <img
-          src="https://avatars.githubusercontent.com/u/78097513?v=4"
-          alt="Thomas"
-        />
-        <div>
-          <strong>MaffezzoIIi/GitHubRepository</strong>
-          <p>Projeto para listar repositórios do GitHub</p>
-        </div>
-      </Repository>
-
-      <Repository>
-        <img
-          src="https://avatars.githubusercontent.com/u/78097513?v=4"
-          alt="Thomas"
-        />
-        <div>
-          <strong>MaffezzoIIi/GitHubRepository</strong>
-          <p>Projeto para listar repositórios do GitHub</p>
-        </div>
-      </Repository>
-
-      <Repository>
-        <img
-          src="https://avatars.githubusercontent.com/u/78097513?v=4"
-          alt="Thomas"
-        />
-        <div>
-          <strong>MaffezzoIIi/GitHubRepository</strong>
-          <p>Projeto para listar repositórios do GitHub</p>
-        </div>
-      </Repository>
-
-      <Repository>
-        <img
-          src="https://avatars.githubusercontent.com/u/78097513?v=4"
-          alt="Thomas"
-        />
-        <div>
-          <strong>MaffezzoIIi/GitHubRepository</strong>
-          <p>Projeto para listar repositórios do GitHub</p>
-        </div>
-      </Repository>
-
-      <Repository>
-        <img
-          src="https://avatars.githubusercontent.com/u/78097513?v=4"
-          alt="Thomas"
-        />
-        <div>
-          <strong>MaffezzoIIi/GitHubRepository</strong>
-          <p>Projeto para listar repositórios do GitHub</p>
-        </div>
-      </Repository>
+      <Repositories>
+        {repositories.map(repository => (
+          <>
+            <img
+              src={repository.owner.avatarUrl}
+              alt={repository.owner.login}
+            />
+            <div>
+              <strong>{repository.fullName}</strong>
+              <p>{repository.description}</p>
+            </div>
+          </>
+        ))}
+      </Repositories>
     </>
   );
 };
